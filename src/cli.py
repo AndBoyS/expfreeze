@@ -4,14 +4,19 @@ import subprocess
 
 import click
 
-from src.const import EXPFR_DIR, REPO_DIR
-from src.utils import get_random_words, is_git_ignored, load_toml
+from src.const import EXPFR_DIR, LOCK_PATH, REPO_DIR
+from src.utils import dump_toml, get_random_words, is_git_ignored, load_toml
 
 
 @click.command()
 @click.argument("path")
 @click.option("--name", default=None, help="Name of the experiment")
 def save_exp(path: str, name: str | None = None) -> None:
+    if LOCK_PATH.exists():
+        lock = load_toml(LOCK_PATH)
+    lock["write_time"] = datetime.datetime.now().strftime("%H:%M:%S")
+    dump_toml(lock, LOCK_PATH)
+
     if name is None:
         name = get_random_words(n=3)
 
@@ -33,7 +38,6 @@ def save_exp(path: str, name: str | None = None) -> None:
 
     d = load_toml(path)
     metrics_path: str = d["metrics_path"]
-    (EXPFR_DIR / ".expfreeze_info").write_text(f"Time: {datetime.datetime.now().strftime('%H:%M:%S')}")
 
     subprocess.run(["git", "-C", str(EXPFR_DIR), "add", "."], check=True)
     subprocess.run(

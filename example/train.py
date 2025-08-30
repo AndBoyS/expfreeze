@@ -1,11 +1,15 @@
 from pathlib import Path
 
+from src.logging import clear_lock, log_params
 from src.utils import dump_json
 
 
 def main() -> None:
+    clear_lock()
     metrics_path = Path(__file__).parent / "metrics.json"
-    metrics = {"train": [0.1, 0.2, 0.3]}
+    params = {"lr": 0.01, "a": 1}
+    log_params(params)
+    metrics = {"train": [0.1, 0.2, 0.3], "test": [0.9]}
     dump_json(metrics, metrics_path)
 
 

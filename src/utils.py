@@ -1,11 +1,12 @@
-import argparse
 import json
 import random
-import re
 import subprocess
 import tomllib
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
+
+import tomli_w
 
 from src.const import REPO_DIR
 
@@ -29,6 +30,11 @@ def dump_json(
 def load_toml(path: str | Path, **kwargs: Any) -> Any:
     with open(path, "rb") as f:
         return tomllib.load(f, **kwargs)
+
+
+def dump_toml(obj: Mapping[str, Any], path: str | Path, **kwargs: Any) -> None:
+    with open(path, "wb") as f:
+        tomli_w.dump(obj, f)
 
 
 def get_random_words(n: int) -> str:
