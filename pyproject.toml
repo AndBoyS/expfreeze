@@ -6,12 +6,13 @@ readme = "README.md"
 authors = [{ name = "AndBoyS", email = "andboyxd@gmail.com" }]
 requires-python = ">=3.11"
 dependencies = [
+    "click>=8.2.1",
 ]
 
 [dependency-groups]
 dev = [
     "mypy==1.16.1",
-    "ruff>=0.9.2",
+    "ruff>=0.12.11",
 ]
 
 [build-system]
@@ -68,3 +69,6 @@ disallow_untyped_calls = false
 allow_redefinition = true
 no_implicit_reexport = false
 follow_untyped_imports = true
+
+[project.scripts]
+save_exp = "src.cli:save_exp"
