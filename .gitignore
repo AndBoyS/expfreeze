@@ -1,3 +1,5 @@
 **/__pycache__
 .venv
 .vscode/launch.json
+example/metrics.json
+expfreeze.lock

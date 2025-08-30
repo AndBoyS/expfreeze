@@ -1,6 +1,7 @@
 import datetime
 import shutil
 import subprocess
+from typing import Any
 
 import click
 
@@ -17,6 +18,9 @@ def save_exp(path: str, name: str | None = None) -> None:
     lock["write_time"] = datetime.datetime.now().strftime("%H:%M:%S")
     dump_toml(lock, LOCK_PATH)
 
+    pipe_info: dict[str, Any] = load_toml(path)
+    metrics_path: str = pipe_info["metrics_path"]
+
     if name is None:
         name = get_random_words(n=3)
 
@@ -29,17 +33,20 @@ def save_exp(path: str, name: str | None = None) -> None:
             p.unlink()
 
     for p in REPO_DIR.glob("*"):
-        if p.name in [".git", EXPFR_DIR.name] or is_git_ignored(p, repo_dir=REPO_DIR):
+        if (
+            (p.name in [".git", EXPFR_DIR.name] or is_git_ignored(p, repo_dir=REPO_DIR))
+            and p.name != LOCK_PATH.name
+            and p != REPO_DIR / metrics_path
+        ):
             continue
         if p.is_dir():
             shutil.copytree(p, EXPFR_DIR / p.name)
         else:
             shutil.copyfile(p, EXPFR_DIR / p.name)
 
-    d = load_toml(path)
-    metrics_path: str = d["metrics_path"]
-
     subprocess.run(["git", "-C", str(EXPFR_DIR), "add", "."], check=True)
+    subprocess.run(["git", "-C", str(EXPFR_DIR), "add", "--force", LOCK_PATH.name], check=True)
+    subprocess.run(["git", "-C", str(EXPFR_DIR), "add", "--force", metrics_path], check=True)
     subprocess.run(
         [
             "git",
@@ -47,7 +54,7 @@ def save_exp(path: str, name: str | None = None) -> None:
             str(EXPFR_DIR),
             "commit",
             "-m",
-            f"{name}\n\nTo replicate: {d['run_cmd']}\nMetrics: {metrics_path}",
+            f"{name}\n\nTo replicate: {pipe_info['run_cmd']}\nMetrics: {metrics_path}",
         ],
         check=True,
     )
