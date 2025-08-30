@@ -1,7 +1,6 @@
-import os
+import datetime
 import shutil
 import subprocess
-from pathlib import Path
 
 import click
 
@@ -33,12 +32,21 @@ def save_exp(path: str, name: str | None = None) -> None:
             shutil.copyfile(p, EXPFR_DIR / p.name)
 
     d = load_toml(path)
-    metrics_path = REPO_DIR / (d["pipeline"]["metrics_path"])
-    shutil.copy(metrics_path, EXPFR_DIR / "expreeze_metrics.json")
+    metrics_path: str = d["metrics_path"]
+    (EXPFR_DIR / ".expfreeze_info").write_text(f"Time: {datetime.datetime.now().strftime('%H:%M:%S')}")
 
-    os.chdir(EXPFR_DIR)
-    subprocess.run(["git", "add", "."], check=True)
-    subprocess.run(["git", "commit", "-m", f'"{name}"'], check=True)
+    subprocess.run(["git", "-C", str(EXPFR_DIR), "add", "."], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(EXPFR_DIR),
+            "commit",
+            "-m",
+            f"{name}\n\nTo replicate: {d['run_cmd']}\nMetrics: {metrics_path}",
+        ],
+        check=True,
+    )
 
 
 if __name__ == "__main__":

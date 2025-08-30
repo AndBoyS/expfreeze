@@ -1,3 +1,2 @@
-[pipeline]
 run_cmd = "uv run example/train.py"
 metrics_path = "example/metrics.json"
