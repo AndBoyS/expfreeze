@@ -1,0 +1,70 @@
+[project]
+name = "expfreeze"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "AndBoyS", email = "andboyxd@gmail.com" }]
+requires-python = ">=3.11"
+dependencies = [
+]
+
+[dependency-groups]
+dev = [
+    "mypy==1.16.1",
+    "ruff>=0.9.2",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.14,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "src"
+module-root = ""
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+  "E",     # pycodestyle
+  "F",     # Pyflakes
+  "UP",    # pyupgrade
+  "B",     # flake8-bugbear
+  "SIM",   # flake8-simplify
+  "I",     # isort
+  "ASYNC",
+  "C4",    # comprehensions
+  "ISC",   # implicit string concat
+  "PT",    # pytest
+  "RET",   # return
+  "PTH",   # pathlib
+  "ERA",   # remove commented code
+  "PD",    # pandas
+  "PGH",   # use specific error code for lint ignores
+  "PL",    # pylint
+  "NPY",   # numpy
+  "PERF",
+  "FURB",
+]
+ignore = [
+  "E501",   # Line too long
+  "PTH123", # open should be replaced by Path.open
+  "ISC001",
+  "RET504",  # creating and returning variable
+  # too many x
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0914",
+  "PLR0915",
+  "PLR0916",
+  "PLR0917",
+]
+
+[tool.mypy]
+strict = true
+disallow_untyped_calls = false
+allow_redefinition = true
+no_implicit_reexport = false
+follow_untyped_imports = true
