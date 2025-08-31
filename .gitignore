@@ -3,3 +3,4 @@
 .vscode/launch.json
 example/metrics.json
 expfreeze.lock
+**/node_modules
