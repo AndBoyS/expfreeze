@@ -13,13 +13,15 @@ from src.utils import dump_toml, get_random_words, is_git_ignored, load_toml
 @click.argument("path")
 @click.option("--name", default=None, help="Name of the experiment")
 def save_exp(path: str, name: str | None = None) -> None:
+    pipe_info: dict[str, Any] = load_toml(path)
+    metrics_path: str = pipe_info["metrics_path"]
+
     if LOCK_PATH.exists():
         lock = load_toml(LOCK_PATH)
     lock["write_time"] = datetime.datetime.now().strftime("%H:%M:%S")
-    dump_toml(lock, LOCK_PATH)
+    lock["run_cmd"] = pipe_info["run_cmd"]
 
-    pipe_info: dict[str, Any] = load_toml(path)
-    metrics_path: str = pipe_info["metrics_path"]
+    dump_toml(lock, LOCK_PATH)
 
     if name is None:
         name = get_random_words(n=3)
