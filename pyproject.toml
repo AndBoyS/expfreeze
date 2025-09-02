@@ -1,28 +1,39 @@
 [project]
-name = "expfreeze"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-authors = [{ name = "AndBoyS", email = "andboyxd@gmail.com" }]
-requires-python = ">=3.11"
-dependencies = ["click>=8.2.1", "tomli-w>=1.2.0"]
+name="expfreeze"
+version="0.1.0"
+description="Add your description here"
+readme="README.md"
+authors=[{name="AndBoyS", email="andboyxd@gmail.com"}]
+requires-python=">=3.11"
+dependencies=[
+  "click>=8.2.1",
+  "dash>=3.2.0",
+  "numpy>=2.3.2",
+  "pandas>=2.3.2",
+  "plotly>=6.3.0",
+  "tomli-w>=1.2.0",
+]
 
 [dependency-groups]
-dev = ["mypy==1.16.1", "ruff>=0.12.11"]
+dev=[
+  "mypy==1.16.1",
+  "ruff>=0.12.11",
+  "plotly-stubs>=0.0.6",
+]
 
 [build-system]
-requires = ["uv_build>=0.8.14,<0.9.0"]
-build-backend = "uv_build"
+requires     =["uv_build>=0.8.14,<0.9.0"]
+build-backend="uv_build"
 
 [tool.uv.build-backend]
-module-name = "src"
-module-root = ""
+module-name="src"
+module-root=""
 
 [tool.ruff]
-line-length = 120
+line-length=120
 
 [tool.ruff.lint]
-select = [
+select=[
   "E",     # pycodestyle
   "F",     # Pyflakes
   "UP",    # pyupgrade
@@ -43,7 +54,7 @@ select = [
   "PERF",
   "FURB",
 ]
-ignore = [
+ignore=[
   "E501",   # Line too long
   "PTH123", # open should be replaced by Path.open
   "ISC001",
@@ -59,11 +70,11 @@ ignore = [
 ]
 
 [tool.mypy]
-strict = true
-disallow_untyped_calls = false
-allow_redefinition = true
-no_implicit_reexport = false
-follow_untyped_imports = true
+strict                =true
+disallow_untyped_calls=false
+allow_redefinition    =true
+no_implicit_reexport  =false
+follow_untyped_imports=true
 
 [project.scripts]
-save_exp = "src.cli:save_exp"
+save_exp="src.cli:save_exp"

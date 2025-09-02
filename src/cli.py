@@ -20,6 +20,7 @@ def save_exp(path: str, name: str | None = None) -> None:
         lock = load_toml(LOCK_PATH)
     lock["write_time"] = datetime.datetime.now().strftime("%H:%M:%S")
     lock["run_cmd"] = pipe_info["run_cmd"]
+    lock["metrics_path"] = pipe_info["metrics_path"]
 
     dump_toml(lock, LOCK_PATH)
 
