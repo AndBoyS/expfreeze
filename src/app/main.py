@@ -3,7 +3,7 @@ from collections import defaultdict
 from dash import Dash, Input, Output, dcc, html
 
 from src.const import EXPFR_DIR, LOCK_PATH
-from src.fetch import get_all_metrics
+from src.fetch import ExperimentData, get_saved_metrics
 from src.utils import load_toml
 
 app = Dash()
@@ -20,7 +20,7 @@ app.layout = [
 ]
 
 LAST_LOCK_TIME: str | None = None
-LAST_METRICS: list[dict[str, list[float]]] | None = None
+LAST_METRICS: list[ExperimentData] | None = None
 
 
 @app.callback(
@@ -34,22 +34,24 @@ def update_graph(n: int) -> html.Div:
     if lock_write_time == LAST_LOCK_TIME and LAST_METRICS is not None:
         all_metrics = LAST_METRICS
     else:
-        all_metrics = get_all_metrics()
+        all_metrics = get_saved_metrics()
         LAST_METRICS = all_metrics
         LAST_LOCK_TIME = lock_write_time
-    metric_type_dict: dict[str, list[list[float]]] = defaultdict(list)
-    for metrics in all_metrics:
-        for name, cur_nums in metrics.items():
-            metric_type_dict[name].append(cur_nums)
+    metric_type_dict: dict[str, list[tuple[str, list[float]]]] = defaultdict(list)
+    for exp in all_metrics:
+        for name, cur_nums in exp.metrics.items():
+            metric_type_dict[name].append((exp.name, cur_nums))
 
-    graphs = []
+    graphs: list[dcc.Graph] = []
 
-    for name, metrics in metric_type_dict.items():
+    for name, exp in metric_type_dict.items():
         graphs.append(
             dcc.Graph(
                 id=f"graph-{name}",
                 figure={
-                    "data": [{"x": len(cur_metrics), "y": cur_metrics} for cur_metrics in metrics],
+                    "data": [
+                        {"x": len(cur_metrics), "y": cur_metrics, "name": exp_name} for exp_name, cur_metrics in exp
+                    ],
                     "layout": {
                         "title": {"text": name},
                     },
