@@ -12,8 +12,11 @@ from src.utils import dump_toml, get_random_words, is_git_ignored, load_toml
 @click.command()
 @click.argument("path")
 @click.option("--name", default=None, help="Name of the experiment")
-def save_exp(path: str, name: str | None = None) -> None:
+@click.option("--run", "run_exp", flag_value=True, default=False, help="Run the pipeline")
+def save_exp(path: str, name: str | None = None, run_exp: bool = False) -> None:
     pipe_info: dict[str, Any] = load_toml(path)
+    if run_exp:
+        subprocess.run(pipe_info["run_cmd"], check=True, shell=True)
     metrics_path: str = pipe_info["metrics_path"]
 
     if LOCK_PATH.exists():
