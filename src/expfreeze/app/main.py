@@ -45,6 +45,7 @@ def update_graph(
     lock_write_time: str = lock["write_time"]
     if lock_write_time == last_lock_time and last_metrics is not None:
         assert graphs_div is not None
+        assert last_lock_time
         return graphs_div, last_metrics, last_lock_time
 
     all_metrics = get_saved_metrics()
@@ -74,12 +75,11 @@ def update_graph(
             )
 
         return html.Div(graphs), all_metrics, lock_write_time
-    del graphs
+        del graphs
     graphs_data: list[dict[str, Any]] = graphs_div["props"]["children"]
 
-    metric_to_graph: dict[str, dict[str, Any]] = {
-        g["props"]["layouе"]["layout"]["title"]["text"]: g for g in graphs_data
-    }
+    metric_to_graph: dict[str, Any] = {g["props"]["layouе"]["layout"]["title"]["text"]: g for g in graphs_data}
+
     for metric_name, exp_name_line in metric_type_dict.items():
         metric_graph = metric_to_graph.get(metric_name)
         if metric_graph is not None:

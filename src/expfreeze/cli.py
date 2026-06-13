@@ -19,6 +19,7 @@ def save_exp(path: str, name: str | None = None, run_exp: bool = False) -> None:
         subprocess.run(pipe_info["run_cmd"], check=True, shell=True)
     metrics_path: str = pipe_info["metrics_path"]
 
+    lock: dict[str, Any] = {}
     if LOCK_PATH.exists():
         lock = load_toml(LOCK_PATH)
     lock["write_time"] = datetime.datetime.now().strftime("%H:%M:%S")
