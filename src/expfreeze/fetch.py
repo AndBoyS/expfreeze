@@ -3,7 +3,7 @@ import subprocess
 import tomllib
 from typing import NamedTuple
 
-from src.const import EXPFR_DIR, LOCK_PATH
+from expfreeze.const import EXPFR_DIR, LOCK_PATH
 
 
 class ExperimentData(NamedTuple):

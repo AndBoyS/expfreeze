@@ -1,7 +1,8 @@
+import random
 from pathlib import Path
 
-from src.logging import clear_lock, log_params
-from src.utils import dump_json
+from expfreeze.logging import clear_lock, log_params
+from expfreeze.utils import dump_json
 
 
 def main() -> None:

@@ -1,7 +1,7 @@
 from typing import Any
 
-from src.const import LOCK_PATH
-from src.utils import dump_toml, load_toml
+from expfreeze.const import LOCK_PATH
+from expfreeze.utils import dump_toml, load_toml
 
 
 def clear_lock() -> None:

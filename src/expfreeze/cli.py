@@ -5,8 +5,8 @@ from typing import Any
 
 import click
 
-from src.const import EXPFR_DIR, LOCK_PATH, REPO_DIR
-from src.utils import dump_toml, get_random_words, is_git_ignored, load_toml
+from expfreeze.const import EXPFR_DIR, LOCK_PATH, REPO_DIR
+from expfreeze.utils import dump_toml, get_random_words, is_git_ignored, load_toml
 
 
 @click.command()

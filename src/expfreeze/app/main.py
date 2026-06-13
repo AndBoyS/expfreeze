@@ -3,9 +3,9 @@ from typing import Any, TypeAlias
 
 from dash import Dash, Input, Output, State, dcc, html
 
-from src.const import EXPFR_DIR, LOCK_PATH
-from src.fetch import ExperimentData, get_saved_metrics
-from src.utils import load_toml
+from expfreeze.const import EXPFR_DIR, LOCK_PATH
+from expfreeze.fetch import ExperimentData, get_saved_metrics
+from expfreeze.utils import load_toml
 
 app = Dash()
 

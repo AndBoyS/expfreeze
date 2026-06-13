@@ -1,5 +1,5 @@
 [project]
-authors = [{name = "AndBoyS", email = "andboyxd@gmail.com"}]
+authors = [{ name = "AndBoyS", email = "andboyxd@gmail.com" }]
 dependencies = [
   "click>=8.2.1",
   "dash>=3.2.0",
@@ -15,19 +15,11 @@ requires-python = ">=3.11"
 version = "0.1.0"
 
 [dependency-groups]
-dev = [
-  "mypy==1.16.1",
-  "plotly-stubs>=0.0.6",
-  "ruff>=0.12.11",
-]
+dev = ["plotly-stubs>=0.0.6", "ruff>=0.12.11", "pyrefly>=1.0.0"]
 
 [build-system]
 build-backend = "uv_build"
-requires = ["uv_build>=0.8.14,<0.9.0"]
-
-[tool.uv.build-backend]
-module-name = "src"
-module-root = ""
+requires = ["uv_build~=0.11.0"]
 
 [tool.ruff]
 line-length = 120
@@ -69,12 +61,11 @@ select = [
   "UP",    # pyupgrade
 ]
 
-[tool.mypy]
-allow_redefinition = true
-disallow_untyped_calls = false
-follow_untyped_imports = true
-no_implicit_reexport = false
-strict = true
+[tool.pyrefly]
+use-ignore-files = false
+enabled-ignores = ["type", "pyrefly", "ty"]
+output-format = "min-text"
+min-severity = "warn"
 
 [project.scripts]
-save_exp = "src.cli:save_exp"
+save_exp = "expfreeze.cli:save_exp"

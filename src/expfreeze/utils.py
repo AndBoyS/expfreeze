@@ -8,7 +8,7 @@ from typing import Any
 
 import tomli_w
 
-from src.const import REPO_DIR
+from expfreeze.const import REPO_DIR
 
 
 def load_json(path: str | Path, **kwargs: Any) -> Any:
