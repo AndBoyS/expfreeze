@@ -1,7 +1,7 @@
 import random
 from pathlib import Path
 
-from expfreeze.logging import clear_lock, log_params
+from expfreeze.log_utils import clear_lock, log_params
 from expfreeze.utils import dump_json
 
 
