@@ -6,6 +6,7 @@ dependencies = [
   "numpy>=2.3.2",
   "pandas>=2.3.2",
   "plotly>=6.3.0",
+  "scmrepo>=3.6.2",
   "tomli-w>=1.2.0",
 ]
 description = "Add your description here"

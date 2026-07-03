@@ -1,12 +1,11 @@
 import datetime
-import shutil
 import subprocess
 from typing import Any
 
 import click
 
-from expfreeze.const import EXPFR_DIR, LOCK_PATH, REPO_DIR
-from expfreeze.utils import dump_toml, get_random_words, is_git_ignored, load_toml
+from expfreeze.const import LOCK_PATH, REPO_DIR, Refs
+from expfreeze.utils import dump_toml, get_random_words, load_toml
 
 
 @click.command()
@@ -17,7 +16,7 @@ def save_exp(path: str, name: str | None = None, run_exp: bool = False) -> None:
     pipe_info: dict[str, Any] = load_toml(path)
     if run_exp:
         subprocess.run(pipe_info["run_cmd"], check=True, shell=True)
-    metrics_path: str = pipe_info["metrics_path"]
+    metrics_path = REPO_DIR / pipe_info["metrics_path"]
 
     lock: dict[str, Any] = {}
     if LOCK_PATH.exists():
@@ -27,45 +26,30 @@ def save_exp(path: str, name: str | None = None, run_exp: bool = False) -> None:
     lock["metrics_path"] = pipe_info["metrics_path"]
 
     dump_toml(lock, LOCK_PATH)
+    stash_res = subprocess.run(["git", "stash", "--staged"], capture_output=True, check=False).stdout.decode()
 
+    # TODO: check for already existing name
     if name is None:
         name = get_random_words(n=3)
 
-    for p in EXPFR_DIR.glob("*"):
-        if p.name == ".git":
-            continue
-        if p.is_dir():
-            shutil.rmtree(p)
-        else:
-            p.unlink()
-
-    for p in REPO_DIR.glob("*"):
-        if (
-            (p.name in [".git", EXPFR_DIR.name] or is_git_ignored(p, repo_dir=REPO_DIR))
-            and p.name != LOCK_PATH.name
-            and p != REPO_DIR / metrics_path
-        ):
-            continue
-        if p.is_dir():
-            shutil.copytree(p, EXPFR_DIR / p.name)
-        else:
-            shutil.copyfile(p, EXPFR_DIR / p.name)
-
-    subprocess.run(["git", "-C", str(EXPFR_DIR), "add", "."], check=True)
-    subprocess.run(["git", "-C", str(EXPFR_DIR), "add", "--force", LOCK_PATH.name], check=True)
-    subprocess.run(["git", "-C", str(EXPFR_DIR), "add", "--force", metrics_path], check=True)
+    subprocess.run(["git", "add", "."], check=True)
+    subprocess.run(["git", "add", "--force", LOCK_PATH], check=True)
+    subprocess.run(["git", "add", "--force", metrics_path], check=True)
     subprocess.run(
         [
             "git",
-            "-C",
-            str(EXPFR_DIR),
             "commit",
             "-m",
             f"{name}\n\nTo replicate: {pipe_info['run_cmd']}\nMetrics: {metrics_path}",
         ],
         check=True,
     )
+    subprocess.run(["git", "update-ref", f"{Refs.EXPS_PREFIX}{name}", "HEAD"], check=True)
+    subprocess.run(["git", "reset", "--mixed", "HEAD~1"], check=True)
+
+    if stash_res:
+        subprocess.run(["git", "stash", "pop", "--index"], check=True)
 
 
 if __name__ == "__main__":
-    save_exp()
+    save_exp([str(REPO_DIR / "example/pipe.toml")])

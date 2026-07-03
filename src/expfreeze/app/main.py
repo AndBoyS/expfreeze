@@ -4,7 +4,7 @@ from typing import Any, TypeAlias
 from dash import Dash, Input, Output, State, dcc, html
 
 from expfreeze.const import EXPFR_DIR, LOCK_PATH
-from expfreeze.fetch import ExperimentData, get_saved_metrics
+from expfreeze.fetch import ExpData, get_saved_metrics
 from expfreeze.utils import load_toml
 
 app = Dash()
@@ -39,8 +39,8 @@ class TypedGraph(dcc.Graph):
     ],
 )
 def update_graph(
-    n: int, graphs_div: dict[str, Any] | None, last_metrics: list[ExperimentData] | None, last_lock_time: str | None
-) -> tuple[html.Div | dict[str, Any], list[ExperimentData], str]:
+    n: int, graphs_div: dict[str, Any] | None, last_metrics: list[ExpData] | None, last_lock_time: str | None
+) -> tuple[html.Div | dict[str, Any], list[ExpData], str]:
     lock = load_toml(EXPFR_DIR / LOCK_PATH.name)
     lock_write_time: str = lock["write_time"]
     if lock_write_time == last_lock_time and last_metrics is not None:

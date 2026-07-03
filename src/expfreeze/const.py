@@ -1,5 +1,10 @@
 from pathlib import Path
 
 REPO_DIR = Path(__file__).parents[2]
-EXPFR_DIR = REPO_DIR / ".expfreeze"
-LOCK_PATH = REPO_DIR / "expfreeze.lock"
+LOCK_NAME = "expfreeze.lock"
+LOCK_PATH = REPO_DIR / LOCK_NAME
+
+
+class Refs:
+    EXPS_PREFIX = "refs/exps/"
+    LAST_EXP = "refs/exps_special/LAST_EXP"

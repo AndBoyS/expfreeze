@@ -3,42 +3,46 @@ import subprocess
 import tomllib
 from typing import NamedTuple
 
-from expfreeze.const import EXPFR_DIR, LOCK_PATH
+from scmrepo.fs import GitFileSystem
+
+from expfreeze.const import LOCK_NAME, REPO_DIR, Refs
 
 
-class ExperimentData(NamedTuple):
+class ExpData(NamedTuple):
     name: str
     metrics: dict[str, list[float]]
 
 
-def get_saved_metrics() -> list[ExperimentData]:
-    commits: list[str] = []
+class ExpCommit(NamedTuple):
+    rev: str
+    name: str
 
-    for branch in get_git_branches():
-        cur_commits_raw = subprocess.check_output(["git", "-C", str(EXPFR_DIR), "log", branch, "--format=format:%H"])
-        commits.extend(cur_commits_raw.decode().splitlines())
 
-    all_metrics: list[ExperimentData] = []
-    for commit in commits:
+def get_all_exps() -> list[ExpCommit]:
+    commits_raw = subprocess.check_output(
+        ["git", "for-each-ref", "--format=%(objectname) %(refname)", f"{Refs.EXPS_PREFIX}*"]
+    )
+    exps: list[ExpCommit] = []
+    for c in commits_raw.decode().splitlines():
+        rev, name = c.split()
+        exps.append(ExpCommit(rev=rev, name=name))
+    return exps
+
+
+def get_saved_metrics() -> list[ExpData]:
+    all_metrics: list[ExpData] = []
+    for exp in get_all_exps():
+        fs = GitFileSystem(str(REPO_DIR), rev=exp.rev)
         try:
-            lock_raw = subprocess.check_output(["git", "-C", str(EXPFR_DIR), "show", f"{commit}:{LOCK_PATH.name}"])
+            lock_raw = fs.read_text(str(LOCK_NAME))
+            assert isinstance(lock_raw, str)
+            metrics_path: str | None = tomllib.loads(lock_raw).get("metrics_path")
+            if metrics_path is None:
+                continue
+            cur_metrics: dict[str, list[float]] = json.loads(fs.read_text(metrics_path))
         except Exception:
             continue
-        metrics_path = tomllib.loads(lock_raw.decode()).get("metrics_path")
-        if metrics_path is None:
-            continue
-        metrics_raw = subprocess.check_output(["git", "-C", str(EXPFR_DIR), "show", f"{commit}:{metrics_path}"])
-        cur_metrics: dict[str, list[float]] = json.loads(metrics_raw.decode())
 
-        commit_name = subprocess.check_output(
-            ["git", "-C", str(EXPFR_DIR), "log", "-1", "--format=%s", commit]
-        ).decode()
-        all_metrics.append(ExperimentData(commit_name, metrics=cur_metrics))
+        all_metrics.append(ExpData(exp.name, metrics=cur_metrics))
 
     return all_metrics
-
-
-def get_git_branches(remote: bool = False) -> list[str]:
-    out = subprocess.check_output(["git", "branch"] + (["-r"] if remote else []))
-    branches = [b.strip() for b in out.decode().splitlines()]
-    return [b.removeprefix("* ") for b in branches if "HEAD detached at" not in b and "->" not in b]
